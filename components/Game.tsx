@@ -69,19 +69,19 @@ export default function Game({ secretWord }: Props) {
         location.reload()
     }
 
-    console.log(secret)
+    console.log(secret, row)
 
     return (
         <div onClick={() => {
             inputRef.current?.focus()
         }}>
-            <HiddenInput name="hidden" ref={inputRef} />
+            <HiddenInput name="hidden" $row={row} ref={inputRef} />
             {words.map((word, i) => <Word
                 id={`word-${i}`}
                 key={i}
                 word={word}
                 secret={secret}
-                active={!finished && (row === i)}
+                activeRow={!finished && (row === i)}
             />)}
             {finished && <Result
                 won={won}
@@ -92,16 +92,17 @@ export default function Game({ secretWord }: Props) {
     )
 }
 
-const HiddenInput = styled.input`
+const HiddenInput = styled.input<{ $row: number }>`
     position: absolute;
-    left: -10000px;
+    top: ${props => props.$row * (100 / 6)}%;
+    opacity: 0;
 `
 
 const Word = (
-    { id, word, secret, active }: { id: string, word: string, secret: string, active: boolean }
+    { id, word, secret, activeRow }: { id: string, word: string, secret: string, activeRow: boolean }
 ) => {
     return (
-        <StyledWord $active={active} id={id}>
+        <StyledWord $activeRow={activeRow} id={id}>
             {[...new Array(5).keys()].map((i) => {
                 const letter = word.charAt(i) || ''
                 const letterNotEmpty = letter !== ''
@@ -110,7 +111,7 @@ const Word = (
                 const noMatch = letterNotEmpty && !partialMatch
                 const render = (type?: MatchType) => <Letter key={i} $type={type}>{letter}</Letter>
 
-                if (active) return render()
+                if (activeRow) return render()
                 if (exactMatch) return render('match')
                 if (partialMatch) return render('partial-match')
                 if (noMatch) return render('no-match')
@@ -120,12 +121,12 @@ const Word = (
     )
 }
 
-const StyledWord = styled.div<{ $active: boolean }>`
+const StyledWord = styled.div<{ $activeRow: boolean }>`
     display: flex;
     justify-content: space-between;
     margin: 5px;
     transition: all .15s ease-in-out;
-    ${props => props.$active && css`
+    ${props => props.$activeRow && css`
         transform: scale(1.1);
         margin: 10px;
     `}
