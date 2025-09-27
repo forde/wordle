@@ -1,19 +1,22 @@
+'use client'
 import Card from '@/components/Card';
-import Game from '@/components/Game';
 import { styled } from 'next-yak';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
-function rnd(max: number) {
-    return Math.floor(Math.random() * max);
-}
+export default function Home() {
+    const router = useRouter()
+    useEffect(() => {
+        const lang = window.localStorage.getItem('lang')
+        if (lang) {
+            router.push(`/${lang.toLowerCase()}`)
+        }
+    }, [router])
 
-export default async function Home() {
-    const pl = Object.values(await import('@/pl.json'))
-    const secretWord = (pl[rnd(pl.length)] || '') as string
-    console.log(secretWord)
     return (
         <StyledDiv>
             <Card>
-                <Game secretWord={secretWord} />
+                Select language
             </Card>
         </StyledDiv>
     )

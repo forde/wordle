@@ -62,18 +62,22 @@ export default function Game({ secretWord }: Props) {
         if (row === 6) {
             setFinished(true)
         }
+        document.getElementById(`word-${row}`)?.scrollIntoView({ behavior: "smooth" });
     }, [row])
 
     const reset = () => {
         location.reload()
     }
 
+    console.log(secret)
+
     return (
         <div onClick={() => {
             inputRef.current?.focus()
         }}>
-            <HiddenInput ref={inputRef} />
+            <HiddenInput name="hidden" ref={inputRef} />
             {words.map((word, i) => <Word
+                id={`word-${i}`}
                 key={i}
                 word={word}
                 secret={secret}
@@ -94,23 +98,25 @@ const HiddenInput = styled.input`
 `
 
 const Word = (
-    { word, secret, active }: { word: string, secret: string, active: boolean }
+    { id, word, secret, active }: { id: string, word: string, secret: string, active: boolean }
 ) => {
     return (
-        <StyledWord $active={active}>
+        <StyledWord $active={active} id={id}>
             {[...new Array(5).keys()].map((i) => {
-                const letter = word.charAt(i)
+                const letter = word.charAt(i) || ''
+                const empty = letter === ''
                 const ok = letter === secret.charAt(i)
-                const okish = !!(letter && (secret.indexOf(letter) !== -1))
-                const wrong = !!(letter && (secret.indexOf(letter) === -1))
+                const okish = !empty && (secret.indexOf(letter) !== -1)
+                const wrong = !empty && !okish
                 return (
                     <Letter
                         key={i}
-                        $active={active}
+                        $empty={empty}
                         $ok={ok}
                         $okish={okish}
                         $wrong={wrong}
-                    >{letter || ''}{ok}</Letter>
+                        $activeRow={active}
+                    >{letter}</Letter>
                 )
             })}
         </StyledWord>
@@ -128,7 +134,7 @@ const StyledWord = styled.div<{ $active: boolean }>`
     `}
 `;
 
-const Letter = styled.div<{ $ok: boolean, $okish: boolean, $wrong: boolean, $active: boolean }>`
+const Letter = styled.div<{ $activeRow: boolean, $ok: boolean, $okish: boolean, $wrong: boolean, $empty: boolean }>`
     display: flex;
     border: 1px solid var(--color-text-grey);
     width: calc(20% - 5px);
@@ -140,7 +146,9 @@ const Letter = styled.div<{ $ok: boolean, $okish: boolean, $wrong: boolean, $act
     font-size: 24px;
     border-radius: 4px;
     font-weight: 600;
-    background: #fff;
+    ${props => props.$empty && css`
+        background: #fff;
+    `}
     ${props => props.$wrong && css`
         background: #eff0f0;
     `}
@@ -150,9 +158,10 @@ const Letter = styled.div<{ $ok: boolean, $okish: boolean, $wrong: boolean, $act
     ${props => props.$ok && css`
         background: #bbec5b;
     `}
-    ${props => props.$active && css`
+    ${props => props.$activeRow && css`
         background: #fff;
     `}
+
 `
 
 const Result = ({ won, secret, onReset }: { won: boolean, secret: string, onReset: () => void }) => (

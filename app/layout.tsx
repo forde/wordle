@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-    title: "Wordle",
+    title: "Wordlee",
     description: "Word game",
 };
 
