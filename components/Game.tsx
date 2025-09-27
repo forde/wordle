@@ -94,7 +94,7 @@ export default function Game({ secretWord }: Props) {
 
 const HiddenInput = styled.input<{ $row: number }>`
     position: absolute;
-    top: ${props => props.$row * (100 / 6)}%;
+    top: ${props => props.$row * (100 / 12)}%;
     opacity: 0;
 `
 
