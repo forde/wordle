@@ -100,12 +100,13 @@ const Word = (
         <StyledWord $active={active}>
             {[...new Array(5).keys()].map((i) => {
                 const letter = word.charAt(i)
-                const ok = !active && letter === secret.charAt(i)
-                const okish = !!(!active && letter && secret.indexOf(letter) !== -1)
-                const wrong = !!(!active && letter && !okish)
+                const ok = letter === secret.charAt(i)
+                const okish = !!(letter && (secret.indexOf(letter) !== -1))
+                const wrong = !!(letter && (secret.indexOf(letter) === -1))
                 return (
                     <Letter
                         key={i}
+                        $active={active}
                         $ok={ok}
                         $okish={okish}
                         $wrong={wrong}
@@ -127,7 +128,7 @@ const StyledWord = styled.div<{ $active: boolean }>`
     `}
 `;
 
-const Letter = styled.div<{ $ok: boolean, $okish: boolean, $wrong: boolean }>`
+const Letter = styled.div<{ $ok: boolean, $okish: boolean, $wrong: boolean, $active: boolean }>`
     display: flex;
     border: 1px solid var(--color-text-grey);
     width: calc(20% - 5px);
@@ -148,6 +149,9 @@ const Letter = styled.div<{ $ok: boolean, $okish: boolean, $wrong: boolean }>`
     `}
     ${props => props.$ok && css`
         background: #bbec5b;
+    `}
+    ${props => props.$active && css`
+        background: #fff;
     `}
 `
 
