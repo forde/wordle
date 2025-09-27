@@ -15,4 +15,5 @@ const StyledDiv = styled.div`
     box-shadow: var(--shadow-soft);
     position: relative;
     max-width: 100%;
+    overflow: hidden;
 `;

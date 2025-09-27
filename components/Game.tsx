@@ -1,0 +1,186 @@
+'use client'
+import { styled, css } from 'next-yak';
+import { HTMLAttributes, useEffect, useState, useRef } from 'react';
+import Button from './Button';
+
+interface Props extends HTMLAttributes<HTMLDivElement> {
+    secretWord: string
+}
+
+export default function Game({ secretWord }: Props) {
+
+    const [secret] = useState(secretWord.toLowerCase())
+    const [row, setRow] = useState(0)
+    const [words, setWords] = useState(['', '', '', '', '', ''])
+    const [finished, setFinished] = useState(false)
+    const [won, setWon] = useState(false)
+
+    const inputRef = useRef<HTMLInputElement>(null)
+
+    useEffect(() => {
+        function onKeyDown(e: KeyboardEvent) {
+            if (finished) {
+                if (e.key === 'Enter') {
+                    location.reload()
+                }
+                return
+            }
+            if (e.key === 'Enter') {
+                //submit
+                if (words[row].length < 5) return
+
+                if (words.filter(w => w).slice(-1)[0] === secret) {
+                    setWon(true)
+                    setFinished(true)
+                }
+                setRow(row => row + 1)
+            } else if (e.key === 'Backspace') {
+                //remove letter
+                setWords(words => {
+                    if (words[row].length === 0) return words
+                    const newWords = [...words]
+                    newWords[row] = newWords[row].substring(0, newWords[row].length - 1)
+                    return newWords
+                })
+            } else {
+                //add letter
+                if (e.key.length !== 1 || !e.key.match(/[a-zśćąęółńżź]/i)) return
+                setWords(words => {
+                    if (words[row].length === 5) return words
+
+                    const newWords = [...words]
+                    newWords[row] = newWords[row].concat(e.key)
+                    return newWords
+                })
+            }
+        }
+        document.addEventListener('keydown', onKeyDown)
+        return () => document.removeEventListener('keydown', onKeyDown)
+    }, [row, words, finished, secret])
+
+    useEffect(() => {
+        if (row === 6) {
+            setFinished(true)
+        }
+    }, [row])
+
+    const reset = () => {
+        location.reload()
+    }
+
+    return (
+        <div onClick={() => {
+            inputRef.current?.focus()
+        }}>
+            <HiddenInput ref={inputRef} />
+            {words.map((word, i) => <Word
+                key={i}
+                word={word}
+                secret={secret}
+                active={!finished && (row === i)}
+            />)}
+            {finished && <Result
+                won={won}
+                secret={secret}
+                onReset={reset}
+            />}
+        </div>
+    )
+}
+
+const HiddenInput = styled.input`
+    position: absolute;
+    left: -10000px;
+`
+
+const Word = (
+    { word, secret, active }: { word: string, secret: string, active: boolean }
+) => {
+    return (
+        <StyledWord $active={active}>
+            {[...new Array(5).keys()].map((i) => {
+                const letter = word.charAt(i)
+                const ok = !active && letter === secret.charAt(i)
+                const okish = !!(!active && letter && secret.indexOf(letter) !== -1)
+                const wrong = !!(!active && letter && !okish)
+                return (
+                    <Letter
+                        key={i}
+                        $ok={ok}
+                        $okish={okish}
+                        $wrong={wrong}
+                    >{letter || ''}{ok}</Letter>
+                )
+            })}
+        </StyledWord>
+    )
+}
+
+const StyledWord = styled.div<{ $active: boolean }>`
+    display: flex;
+    justify-content: space-between;
+    margin: 5px;
+    transition: all .15s ease-in-out;
+    ${props => props.$active && css`
+        transform: scale(1.1);
+        margin: 10px;
+    `}
+`;
+
+const Letter = styled.div<{ $ok: boolean, $okish: boolean, $wrong: boolean }>`
+    display: flex;
+    border: 1px solid var(--color-text-grey);
+    width: calc(20% - 5px);
+    height: 60px;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    border-radius: 4px;
+    font-weight: 600;
+    background: #fff;
+    ${props => props.$wrong && css`
+        background: #eff0f0;
+    `}
+    ${props => props.$okish && css`
+        background: #ffed6c;
+    `}
+    ${props => props.$ok && css`
+        background: #bbec5b;
+    `}
+`
+
+const Result = ({ won, secret, onReset }: { won: boolean, secret: string, onReset: () => void }) => (
+    <StyledResult>
+        <div>{won ? '🎉' : '💩'}</div>
+        <h1>{won ? 'Congrats!' : 'Sorry!'}</h1>
+        <p>The word was &quot;<span>{secret}</span>&quot;</p>
+        <Button onClick={onReset} >Try again</Button>
+    </StyledResult>
+)
+
+const StyledResult = styled.div`
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background: rgba(255,255,255,.9);
+    div {
+        font-size: 150px;
+        line-height: 1;
+        margin-bottom: 30px;
+    }
+    p {
+        margin: 20px 0;
+        font-size: 22px;
+        span {
+            font-weight: 600;
+        }
+    }
+`

@@ -1,14 +1,14 @@
 import { styled } from "next-yak";
 import Link from "next/link";
-import { FaReact } from "react-icons/fa";
 import Container from "./Container";
+import { RiCharacterRecognitionFill } from "react-icons/ri";
 
 export default function NavBar() {
     return (
         <StyledDiv>
             <Container>
                 <Link href="/">
-                    <FaReact />
+                    <RiCharacterRecognitionFill /> Wordle
                 </Link>
             </Container>
         </StyledDiv>
@@ -27,11 +27,18 @@ const StyledDiv = styled.div`
         display: flex;
         height: 100%;
         align-items: center;
-        justify-content: space-between;
+        justify-content: center;
         > a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             display: contents;
+            font-size: 28px;
+            font-weight: 800;
             svg {
-                font-size: 32px;
+                font-size: 40px;
+                position: relative;
+                margin: -4px 8px 0 0;
             }
         }
     }

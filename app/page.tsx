@@ -1,26 +1,20 @@
-import Button from '@/components/Button';
 import Card from '@/components/Card';
-import Input from '@/components/Input';
-import Label from '@/components/Label';
+import Game from '@/components/Game';
 import { styled } from 'next-yak';
 
-export default function Home() {
+function rnd(max: number) {
+    return Math.floor(Math.random() * max);
+}
+
+export default async function Home() {
+    const pl = Object.values(await import('@/pl.json'))
+    const secretWord = (pl[rnd(pl.length)] || '') as string
+    console.log(secretWord)
     return (
         <StyledDiv>
             <Card>
-                <Label>Label</Label>
-                <Input placeholder="Placeholder" />
-                <Input size="small" placeholder="Placeholder" />
-                <Input errors={['required!']} placeholder="Placeholder" />
-                <Input errors={['required!']} size="small" placeholder="Placeholder" />
-                <div className="buttons">
-                    <Button >Click!</Button>
-                    <Button variant="secondary">Click!</Button>
-                    <Button size="small">Click!</Button>
-                    <Button size="small" variant="secondary">Click!</Button>
-                </div>
+                <Game secretWord={secretWord} />
             </Card>
-
         </StyledDiv>
     )
 }
@@ -32,17 +26,7 @@ const StyledDiv = styled.div`
     align-items: center;
     min-height: calc(100vh - var(--navbar-height));
     > div {
-        width: 600px;
+        width: 400px;
         padding: 24px;
-        > * {
-            margin-bottom: 10px;
-        }
-        :global(.buttons) {
-            display: flex;
-            align-items: center;
-            button {
-                margin-right: 12px;
-            }
-        }
     }
 `;

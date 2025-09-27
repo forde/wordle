@@ -9,8 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-    title: "Next.js",
-    description: "React app boilerplate",
+    title: "Wordle",
+    description: "Word game",
 };
 
 export default function RootLayout({
