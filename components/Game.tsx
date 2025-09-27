@@ -104,20 +104,17 @@ const Word = (
         <StyledWord $active={active} id={id}>
             {[...new Array(5).keys()].map((i) => {
                 const letter = word.charAt(i) || ''
-                const empty = letter === ''
-                const ok = letter === secret.charAt(i)
-                const okish = !empty && (secret.indexOf(letter) !== -1)
-                const wrong = !empty && !okish
-                return (
-                    <Letter
-                        key={i}
-                        $empty={empty}
-                        $ok={ok}
-                        $okish={okish}
-                        $wrong={wrong}
-                        $activeRow={active}
-                    >{letter}</Letter>
-                )
+                const letterNotEmpty = letter !== ''
+                const exactMatch = letter === secret.charAt(i)
+                const partialMatch = letterNotEmpty && (secret.indexOf(letter) !== -1)
+                const noMatch = letterNotEmpty && !partialMatch
+                const render = (type?: MatchType) => <Letter key={i} $type={type}>{letter}</Letter>
+
+                if (active) return render()
+                if (exactMatch) return render('match')
+                if (partialMatch) return render('partial-match')
+                if (noMatch) return render('no-match')
+                return render()
             })}
         </StyledWord>
     )
@@ -134,7 +131,12 @@ const StyledWord = styled.div<{ $active: boolean }>`
     `}
 `;
 
-const Letter = styled.div<{ $activeRow: boolean, $ok: boolean, $okish: boolean, $wrong: boolean, $empty: boolean }>`
+type MatchType = 'match' | 'partial-match' | 'no-match'
+interface LetterProps {
+    $type?: MatchType
+}
+
+const Letter = styled.div<LetterProps>`
     display: flex;
     border: 1px solid var(--color-text-grey);
     width: calc(20% - 5px);
@@ -146,22 +148,16 @@ const Letter = styled.div<{ $activeRow: boolean, $ok: boolean, $okish: boolean, 
     font-size: 24px;
     border-radius: 4px;
     font-weight: 600;
-    ${props => props.$empty && css`
-        background: #fff;
-    `}
-    ${props => props.$wrong && css`
-        background: #eff0f0;
-    `}
-    ${props => props.$okish && css`
-        background: #ffed6c;
-    `}
-    ${props => props.$ok && css`
+    background: #fff;
+    ${props => props.$type === 'match' && css`
         background: #bbec5b;
     `}
-    ${props => props.$activeRow && css`
-        background: #fff;
+    ${props => props.$type === 'partial-match' && css`
+        background: #ffed6c;
     `}
-
+    ${props => props.$type === 'no-match' && css`
+        background: #eff0f0;
+    `}
 `
 
 const Result = ({ won, secret, onReset }: { won: boolean, secret: string, onReset: () => void }) => (
