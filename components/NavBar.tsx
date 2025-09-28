@@ -24,7 +24,7 @@ export default function NavBar() {
         <StyledDiv>
             <Container>
                 <Link href="/">
-                    <RiCharacterRecognitionFill /> Wordlee
+                    <RiCharacterRecognitionFill /> Wordle
                 </Link>
                 <Languages>
                     {['gb', 'pl'].map(code => (

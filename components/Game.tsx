@@ -62,14 +62,14 @@ export default function Game({ secretWord }: Props) {
         if (row === 6) {
             setFinished(true)
         }
-        document.getElementById(`word-${row}`)?.scrollIntoView({ behavior: "smooth" });
+        document.getElementById(`word-${row - 1}`)?.scrollIntoView({ behavior: "smooth" });
     }, [row])
 
     const reset = () => {
         location.reload()
     }
 
-    console.log(secret, row)
+    console.log(secret)
 
     return (
         <div onClick={() => {
@@ -94,8 +94,9 @@ export default function Game({ secretWord }: Props) {
 
 const HiddenInput = styled.input<{ $row: number }>`
     position: absolute;
-    top: ${props => props.$row * (100 / 12)}%;
-    opacity: 0;
+    //top: ${props => props.$row * (100 / 12)}%;
+    //opacity: 0;
+    top: -9999px;
 `
 
 const Word = (
